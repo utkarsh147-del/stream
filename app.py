@@ -22,7 +22,22 @@ import streamlit.components.v1 as components
 import webbrowser
 import random
 #from streamlit import app_mode
-
+rtc_configuration = RTCConfiguration(
+    {
+        "iceServers": [
+            {
+                "urls": ["turn:bn-turn1.xirsys.com:80?transport=udp",
+       "turn:bn-turn1.xirsys.com:3478?transport=udp",
+       "turn:bn-turn1.xirsys.com:80?transport=tcp",
+       "turn:bn-turn1.xirsys.com:3478?transport=tcp",
+       "turns:bn-turn1.xirsys.com:443?transport=tcp",
+       "turns:bn-turn1.xirsys.com:5349?transport=tcp"],
+                "username": "TBPiEMw7tX24LLZvFW8ymeB-DwRFYTzQ8eVh1B3yroLEeERJ4lBh7HQKQXXD6gJaAAAAAGRUyXJ1dGthcnNoMzU2",
+                "credential": "87bac70a-eb25-11ed-b31b-0242ac140004",
+            }
+        ]
+    }
+)
 # Loading css file
 local_css("style.css")
 if 'app_mode' not in st.session_state:
