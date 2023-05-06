@@ -4,6 +4,7 @@ opencv_python
 pandas
 Pillow
 plotly
+streamlit-webrtc
 pydeck
 scikit_learn
 streamlit
