@@ -8,8 +8,6 @@ import streamlit as st
 st.set_page_config(page_title='eSangeet', layout = 'wide', initial_sidebar_state = 'auto')
 from streamlit_option_menu import option_menu
 import streamlit.components.v1 as components
-from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
-import csv
 import plotly.express as px
 from sklearn.neighbors import NearestNeighbors
 import pandas as pd
@@ -24,7 +22,6 @@ import base64
 import streamlit.components.v1 as components
 import webbrowser
 import random
-import time
 #from streamlit import app_mode
 rtc_configuration = RTCConfiguration(
     {
@@ -48,89 +45,9 @@ if 'app_mode' not in st.session_state:
     st.session_state['app_mode'] = 'value'
 
 # Session State also supports the attribute based syntax
-json_file = open('fer.json', 'r')
-loaded_model_json = json_file.read()
-json_file.close()
-model = model_from_json(loaded_model_json)
 
-# Load weights and them to model
-model.load_weights('fer.h5')
-
-face_haar_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-latest_emotion = []
-# ite=9
-
-            
-class VideoTransformer(VideoTransformerBase):
-            latest_emotion = None
-            def __init__(self):
-                self.latest_emotions = []
-                self.csv_file = open('emotions.csv', 'a', newline='')
-                self.csv_writer = csv.writer(self.csv_file)
-                
-            def transform(self, frame):
-                self.csv_file.seek(0)
-                self.csv_file.truncate()
-                self.csv_writer.writerow(['Emotion'])
-                global latest_emotion
-                VideoTransformer.latest_emotion = latest_emotion
-                img = frame.to_ndarray(format="bgr24")
-                gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                faces_detected = face_haar_cascade.detectMultiScale(gray_img, 1.1, 6, minSize=(150, 150))
-                for (x, y, w, h) in faces_detected:
-                    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), thickness=2)
-                    roi_gray = gray_img[y:y + w, x:x + h]
-                    roi_gray = cv2.resize(roi_gray, (48, 48))
-                    img_pixels = img_to_array(roi_gray)
-                    img_pixels = np.expand_dims(img_pixels, axis=0)
-                    img_pixels /= 255.0
-                    predictions = model.predict(img_pixels)
-                    max_index = int(np.argmax(predictions))
-                    emotions = ['neutral', 'happiness', 'surprise', 'sadness', 'anger', 'disgust', 'fear']
-                    predicted_emotion = emotions[max_index]
-                    # latest_emotion=predicted_emotion
-                    self.latest_emotions.append(predicted_emotion)
-                    self.csv_writer.writerow([predicted_emotion])
-                        
-                    print(self.latest_emotions)
-                    st.success(latest_emotion)
-                    cv2.putText(img, predicted_emotion, (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
-                    # print(self.iter)
-                    # self.ite+=1 
-                return img
-            # def close(self):
-            #     self.csv_file.close()
-
-def funn():
-        st.title("Facial Emotion Recognition")
-        webrtc_streamer(key="example", video_transformer_factory=VideoTransformer)
-        return latest_emotion
-        
-emotions = funn()
-emotion = None
-
-with open('emotions.csv', 'r', newline='') as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        try:
-            data_row = next(csv_reader)
-            emotion = data_row['Emotion']
-        except StopIteration:
-            # The CSV file is empty, or there is no data in the first row
-            pass
-
-        if emotion is not None:
-            # Do something with the emotion
-            st.write(f'Your mood is {emotion}')
-            
-            
-        else:
-            # The CSV file is empty or there was no data in the first row
-            print('No emotion data found in the CSV file')
 
 # Sidebar Section
-l=emotion
-
-print("ll",emotion)
 def spr_sidebar():
     with st.sidebar:
         # st.image(SPR_SPOTIFY_URL, width=60)
@@ -400,22 +317,154 @@ def n_neighbors_uri_audio(genre, start_year, end_year, test_feat):
 
 
 # Recommendation Page
-print("kk",l)
-while l is None:
-    time.sleep(1)
-global vd
-vd=l
+def run_other_script():
+    json_file = open('fer.json', 'r')
+    loaded_model_json = json_file.read()
+    json_file.close()
+    model = model_from_json(loaded_model_json)
 
+# Load weights and them to model
+    model.load_weights('fer.h5')
+
+    face_haar_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+
+    cap = cv2.VideoCapture(0)
+
+#cap = cv2.VideoCapture(0)  # 0 indicates the default camera on your computer
+
+    start_time = time.time()
+#while (time.time() - start_time) < 10:
+
+    while (time.time() - start_time) <= 50:
+        ret, img = cap.read()
+    
+        if not ret:
+            break
+
+        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        faces_detected = face_haar_cascade.detectMultiScale(gray_img, 1.1, 6, minSize=(150, 150))
+
+        for (x, y, w, h) in faces_detected:
+            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), thickness=2)
+            roi_gray = gray_img[y:y + w, x:x + h]
+            roi_gray = cv2.resize(roi_gray, (48, 48))
+            img_pixels =img_to_array(roi_gray)
+            img_pixels = np.expand_dims(img_pixels, axis=0)
+            img_pixels /= 255.0
+
+            predictions = model.predict(img_pixels)
+        #"x = image.img_to_array(img)" to "x = img_to_array(img)"
+            max_index = int(np.argmax(predictions))
+
+            emotions = [ 'neutral','happiness', 'surprise', 'sadness', 'anger', 'disgust', 'fear']
+            predicted_emotion = input("enter ur emotion")
+
+            cv2.putText(img, predicted_emotion, (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
+
+            resized_img = cv2.resize(img, (1000, 700))
+            cv2.imshow('Facial Emotion Recognition', resized_img)
+            if(time.time() - start_time)>20:
+                print("your emotion",predicted_emotion)
+        
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    
+    cap.release()
+    cv2.destroyAllWindows()
+    return predicted_emotion
+def out():
+    if 'name' not in st.session_state:
+        st.session_state.name = ''
+
+        name = st.text_input('Enter your name:', value=st.session_state.name)
+
+    if name:
+        st.write(f'Hello, {name}!')
+    else:
+        st.write('Please enter your name.')
+    return name
+def run_detection():
+    predicted_emotion = out()
+    st.write(f'Your mood is {predicted_emotion}')
+    return predicted_emotion
+global vd
+vd='neutral'
 def rec_page():
     
-    st.header("RECOMMENDATION ENGINE")
-    # st.markdown("[Click here](https://www.example.com/) to run another script.")
+        st.header("RECOMMENDATION ENGINE")
+        st.markdown("[Click here](https://www.example.com/) to run another script.")
+        st.markdown("""
+        <style>
+        img {
+            border: 5px solid black;
+        }
+        .my-button-container > div.stButton > button:Happy {
+            font-size: 20px;
+            height: 3em;
+            width: 30px;
+        }
     
-    
+        button:hover {
+            background-color: #3e8e41;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        # Create a variable to store the mood
+        mood = None
+        vd='neutral'
+        # Create two columns
+        col1, col2 = st.columns(2)
+
+        # Set the image size
+        image_size = 100
+
+        # Load and resize the first image
+        image1 = Image.open("happy.png")
+        image1 = image1.resize((image_size, image_size))
+
+        # Display the first image in the first column
+        col1.image(image1)
+        if col1.button("Happy"):
+            mood = "happiness"
+
+        # Load and resize the second image
+        image2 = Image.open("neutral.jpg")
+        image2 = image2.resize((image_size, image_size))
+
+        # Display the second image in the first column
+        col1.image(image2)
+        if col1.button("Neutral"):
+            mood = "neutral"
+
+        # Load and resize the third image
+        image3 = Image.open("sad.jpg")
+        image3 = image3.resize((image_size, image_size))
+
+        # Display the third image in the second column
+        col2.image(image3)
+        st.markdown("<div class='my-button-container'>", unsafe_allow_html=True)
+        if col2.button("Sad"):
+            mood = "sadness"
+
+        # Load and resize the fourth image
+        image4 = Image.open("angry.jpg")
+        image4 = image4.resize((image_size, image_size))
+
+        # Display the fourth image in the second column
+        col2.image(image4)
+        if col2.button("Angry"):
+            mood = "anger"
+
+        # Display the selected mood
+        # if mood:
+        #     st.write(f"You selected: {mood}")
+        if mood:
+            vd=mood
      #  def call():
      #      return vd
     #u=call()   
-    def fun():
+    
       #  print("jkk",vd)
         #if vd=='neutral':
          #       vd=random.choice(genre)
@@ -530,10 +579,13 @@ def rec_page():
         st.subheader("Graph Representing Audio Features Importance")
         random_forest_audio_importance = Image.open('images/random_forest_audio_importance_feature.jpg')
         st.image(random_forest_audio_importance, caption ="random_forest_audio_feature_importance", width = 900)
-        if st.button("Click for next"):
-            fun()
-          
-      
+  #  if st.button("Click for next"):
+  #      fun()
+    # if st.button('Run Mood Detection'):
+    #   vd=run_detection()  
+    #   if vd=='neutral':
+    #    vd=random.choice(genre_names)      
+    #   fun()
 # Home Page
 
 def home_page():
