@@ -286,7 +286,7 @@ def load_data():
 
 #genre_names = ['Dance Pop', 'Electronic', 'Electropop', 'Hip Hop',
  #              'Jazz', 'K-pop', 'Latin', 'Pop', 'Pop Rap', 'R&B', 'Rock']
-genre_names=['happiness', 'sadness', 'anger','neutral']
+genre_names=['happiness', 'sadness', 'anger']
 audio_feats = ["acousticness", "danceability",
                "energy", "instrumentalness", "valence", "tempo"]
 
@@ -294,7 +294,7 @@ exploded_track_df = load_data()
 
 #genre_names = ['Dance Pop', 'Electronic', 'Electropop', 'Hip Hop',
  #              'Jazz', 'K-pop', 'Latin', 'Pop', 'Pop Rap', 'R&B', 'Rock']
-genre_names=['happiness', 'sadness', 'anger','neutral']
+genre_names=['happiness', 'sadness', 'anger']
 audio_feats = ["acousticness", "danceability",
                "energy", "instrumentalness", "valence", "tempo"]
 
@@ -392,7 +392,7 @@ vd='neutral'
 def rec_page():
     
         st.header("RECOMMENDATION ENGINE")
-        st.markdown("[Click here](https://www.example.com/) to run another script.")
+        # st.markdown("[Click here](https://www.example.com/) to run another script.")
         st.markdown("""
         <style>
         img {
@@ -474,8 +474,8 @@ def rec_page():
         #    for u in genre_names:
          #       if u==vd:
           #          break
-            #if vd=='neutral':
-             #   vd=random.choice(genre)
+            if vd=='neutral':
+               vd=random.choice(genre_names)
             st.markdown("***Choose your genre:***")
             genre = st.radio(
                 "",
